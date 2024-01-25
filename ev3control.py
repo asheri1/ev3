@@ -34,14 +34,14 @@ class EV3Robot:
     def read_sensors_data(self, duration):
 
         for i in range(duration):
-            print("Distance:", self.read_distance())
+            #print("Distance:", self.read_distance())
             debug_print("Distance:", self.read_distance())
             
-            print("color:", self.read_color_sensor())
+            #print("color:", self.read_color_sensor())
             debug_print("color:", self.read_color_sensor())
 
-            print("touch:", self.read_color_sensor())
-            debug_print("color:", self.read_color_sensor())
+            #print("touch:", self.read_touch_sensor())
+            debug_print("touch:", self.read_touch_sensor())
             
             time.sleep(1)
 
@@ -57,7 +57,7 @@ class EV3Robot:
         self.drive(left_speed, right_speed)
 
         if read_data:
-            self.read_sensors_data() #duration is implemented inside read_sensors_data method.
+            self.read_sensors_data(duration) #duration is implemented inside read_sensors_data method.
 
         else:
             time.sleep(duration)
