@@ -6,6 +6,18 @@ from ev3dev2.sensor import INPUT_1, INPUT_2, INPUT_4
 from ev3dev2.sensor.lego import TouchSensor, ColorSensor, UltrasonicSensor
 from ev3dev2.led import Leds
 
+import numpy as np
+
+# Load the Q-table
+Q_table = np.load('q_table.npy', allow_pickle=True)
+
+
+
+# Function to get the action for a given state
+def get_action(state):
+    return np.argmax(Q_table[state])
+
+
 class EV3Robot:
     def __init__(self):
         # Motors
@@ -102,6 +114,29 @@ class EV3Robot:
         # Set LED color
         self.leds.set_color("LEFT", color)
         self.leds.set_color("RIGHT", color)
+
+    def get_current_state(touch_sensor, distance_sensor, color_sensor):
+        # Example process to convert sensor readings to state index
+        touch_state = int(touch_sensor.read())
+        distance_state = int(distance_sensor.read())
+        color_state = color_sensor.read()  # Assume this returns an integer directly
+
+        state_index = (touch_state, distance_state, color_state)
+        return state_index
+    
+    def select_action(Q_table, current_state):
+        # Assuming current_state is a tuple that matches the Q-table's multi-index
+        state_actions = Q_table[current_state]
+        best_action = np.argmax(state_actions)
+        return best_action
+
+    def execute_action(self, action):
+        if action == 0:
+           self.drive_with_time_suspension(left_speed=30, right_speed=30, duration=0.5)
+        elif action == 1:
+            self.turn_left(speed=50,duration=0.5)
+        elif action == 2:
+            self.turn_right(speed=50,turn_rate=50,duration=0.5)
 
 
 

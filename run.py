@@ -4,6 +4,13 @@ from screen_utils import *
 from ev3control import *
 import threading
 
+
+# Example usage:
+# Assuming 'state' is the current state of the robot
+init_state = 0
+action = get_action(init_state)
+
+
 # def monitor_touch_sensor(robot):
 #     while True:
 #         if robot.read_touch_sensor():
