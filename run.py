@@ -5,11 +5,6 @@ from ev3control import *
 import threading
 
 
-# Example usage:
-# Assuming 'state' is the current state of the robot
-init_state = 0
-action = get_action(init_state)
-
 
 # def monitor_touch_sensor(robot):
 #     while True:
@@ -41,13 +36,27 @@ if __name__ == "__main__":
     # while not robot.read_distance() <= 3:
     #     pass
 
-    robot.turn_right(50)
-    debug_print("turned right")
-    robot.drive_with_time_suspension(duration=0.5,read_data=1)
-    robot.turn_left(50)
-    debug_print("turned left")
-    robot.drive_with_time_suspension(duration=0.5, read_data=1)
-    robot.turn_right(50)
-    robot.turn_right(50)
-    debug_print("turned back")
-    time.sleep(5)
+
+
+    # robot.turn_right(50)
+    # debug_print("turned right")
+    # robot.drive_with_time_suspension(duration=0.5,read_data=1)
+    # robot.turn_left(50)
+    # debug_print("turned left")
+    # robot.drive_with_time_suspension(duration=0.5, read_data=1)
+    # robot.turn_right(50)
+    # robot.turn_right(50)
+    # debug_print("turned back")
+    # time.sleep(5)
+
+
+    while(True):
+        # color is Red, goal reached
+        if robot.read_color_sensor() == 5:
+            break
+
+        state = robot.get_current_state()
+        next_action = robot.get_next_action(state)
+        robot.execute_action(next_action)
+
+    

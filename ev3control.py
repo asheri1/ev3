@@ -8,18 +8,15 @@ from ev3dev2.led import Leds
 
 import numpy as np
 
-# Load the Q-table
-Q_table = np.load('q_table.npy', allow_pickle=True)
-
-
-
-# Function to get the action for a given state
-def get_action(state):
-    return np.argmax(Q_table[state])
 
 
 class EV3Robot:
+
     def __init__(self):
+        
+        #Q_table
+        self.Q_table = np.load('q_table.npy', allow_pickle=True)
+        
         # Motors
         self.left_motor = LargeMotor(OUTPUT_A)
         self.right_motor = LargeMotor(OUTPUT_B)
@@ -44,7 +41,9 @@ class EV3Robot:
 
     
     def read_sensors_data(self, duration):
-
+        if type(duration)!=int:
+            return
+        
         for i in range(duration):
             #print("Distance:", self.read_distance())
             debug_print("Distance:", self.read_distance())
@@ -115,18 +114,19 @@ class EV3Robot:
         self.leds.set_color("LEFT", color)
         self.leds.set_color("RIGHT", color)
 
-    def get_current_state(touch_sensor, distance_sensor, color_sensor):
-        # Example process to convert sensor readings to state index
-        touch_state = int(touch_sensor.read())
-        distance_state = int(distance_sensor.read())
-        color_state = color_sensor.read()  # Assume this returns an integer directly
-
-        state_index = (touch_state, distance_state, color_state)
-        return state_index
+    def get_current_state(self):
+        # Use the robot's sensor methods to get the current state
+        touch_state = self.read_touch_sensor()
+        distance_state = int(self.read_distance())
+        color_state = self.read_color_sensor()
+        state = (touch_state, distance_state, color_state)
+        return state
     
-    def select_action(Q_table, current_state):
+    def get_next_action(self, current_state):
         # Assuming current_state is a tuple that matches the Q-table's multi-index
-        state_actions = Q_table[current_state]
+        state_actions = self.Q_table[current_state]
+        if state_actions == None:
+            return 0
         best_action = np.argmax(state_actions)
         return best_action
 
