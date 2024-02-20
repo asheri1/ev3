@@ -8,3 +8,4 @@ with open('a.txt', 'w') as f:
     for row in Q_table:
         np.savetxt(f, row.reshape(1, row.size), fmt='%s')
 f.close()
+
