@@ -6,7 +6,19 @@ from ev3dev2.sensor import INPUT_1, INPUT_2, INPUT_4
 from ev3dev2.sensor.lego import TouchSensor, ColorSensor, UltrasonicSensor
 from ev3dev2.led import Leds
 
+import json
 import numpy as np
+
+
+def read_json_to_dict():
+    # Load the JSON data from the file
+    with open('QTable.json', 'r') as json_file:
+        Q_dict_str_keys = json.load(json_file)
+
+    # Convert the keys back to tuples and convert int64 values to Python int
+    Q_dict = {tuple(map(int, key.split(','))): int(value) if isinstance(value, int) else value for key, value in Q_dict_str_keys.items()}
+    return Q_dict
+
 
 
 
@@ -15,7 +27,7 @@ class EV3Robot:
     def __init__(self):
         
         #Q_table
-        self.Q_table = np.load('q_table.npy', allow_pickle=True)
+        self.Q_table = read_json_to_dict()
         
         # Motors
         self.left_motor = LargeMotor(OUTPUT_A)
@@ -109,10 +121,7 @@ class EV3Robot:
         # Read the ultrasonic sensor
         return self.ultrasonic_sensor.distance_centimeters
 
-    def set_led(self, color):
-        # Set LED color
-        self.leds.set_color("LEFT", color)
-        self.leds.set_color("RIGHT", color)
+
 
     def get_current_state(self):
         # Use the robot's sensor methods to get the current state
@@ -124,11 +133,8 @@ class EV3Robot:
     
     def get_next_action(self, current_state):
         # Assuming current_state is a tuple that matches the Q-table's multi-index
-        state_actions = self.Q_table[current_state]
-        if state_actions == None:
-            return 0
-        best_action = np.argmax(state_actions)
-        return best_action
+        action = self.Q_table[current_state]
+        return action
 
     def execute_action(self, action):
         if action == 0:
