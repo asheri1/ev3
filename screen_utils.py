@@ -36,4 +36,9 @@ def set_font(name):
     '''
     os.system('setfont ' + name)
 
+
+def set_screen():
+    reset_console()
+    set_cursor(OFF)
+    set_font('Lat15-Terminus24x12')
     

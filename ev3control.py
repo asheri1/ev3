@@ -7,7 +7,9 @@ from ev3dev2.sensor.lego import TouchSensor, ColorSensor, UltrasonicSensor
 from ev3dev2.led import Leds
 
 import json
-import numpy as np
+
+
+DISTANCE_LIMIT = 10 #cm
 
 
 def read_json_to_dict():
@@ -109,6 +111,18 @@ class EV3Robot:
         left_speed = speed * percentage
         self.drive_with_time_suspension(left_speed, speed, duration)
 
+
+    def turn_back(self, speed=100, duration=1):
+        """
+        Turns the robot backwards.
+        :param speed: Base speed of the motors.
+        :param turn_rate: Percentage to reduce the speed of the left motor.
+        """
+        left_speed = 0
+        self.drive_with_time_suspension(left_speed, speed, duration)
+
+
+
     def read_touch_sensor(self):
         # Read the touch sensor
         return self.touch_sensor.is_pressed
@@ -120,6 +134,10 @@ class EV3Robot:
     def read_distance(self):
         # Read the ultrasonic sensor
         return self.ultrasonic_sensor.distance_centimeters
+    
+
+    def reaching_an_object(self):
+        return self.read_distance() < DISTANCE_LIMIT
 
 
 
@@ -131,19 +149,32 @@ class EV3Robot:
         state = (touch_state, distance_state, color_state)
         return state
     
+    
     def get_next_action(self, current_state):
         # Assuming current_state is a tuple that matches the Q-table's multi-index
         action = self.Q_table[current_state]
         return action
 
-    def execute_action(self, action):
-        if action == 0:
+
+    def execute(self, next_action):
+        if next_action == 0:
            self.drive_with_time_suspension(left_speed=30, right_speed=30, duration=0.5)
-        elif action == 1:
+        elif next_action == 1:
             self.turn_left(speed=50,duration=0.5)
-        elif action == 2:
+        elif next_action == 2:
             self.turn_right(speed=50,turn_rate=50,duration=0.5)
 
+
+
+    def step_action(self):
+        state = self.get_current_state() 
+        next_action = self.get_next_action(state)
+        self.execute(next_action)
+
+
+    def goal_reached(self):
+        # color is Red, goal reached
+        return self.read_color_sensor() == 5
 
 
 
