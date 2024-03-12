@@ -18,7 +18,7 @@ def debug_print_run_time(start_time):
     end_time = time.time()
     elapsed_time = end_time - start_time
     formatted_time = time.strftime("%H:%M:%S", time.gmtime(elapsed_time))
-    debug_print("Time elapsed during the test: %s", formatted_time)
+    debug_print("Time elapsed during the test: ", formatted_time)
     
 
 
