@@ -5,19 +5,18 @@ from ev3control import *
 import time
 
 TIME_LIMIT = 120
-START_TIME  = time.time()
 
 
-def time_condition():
+def time_condition(start_time):
     current_time = time.time()
-    elapsed_time = current_time - START_TIME
+    elapsed_time = current_time - start_time
     condition =   (elapsed_time <= TIME_LIMIT)
     return condition
 
 
-def debug_print_run_time():
+def debug_print_run_time(start_time):
     end_time = time.time()
-    elapsed_time = end_time - START_TIME
+    elapsed_time = end_time - start_time
     formatted_time = time.strftime("%H:%M:%S", time.gmtime(elapsed_time))
     debug_print("Time elapsed during the test: %s", formatted_time)
     
@@ -28,25 +27,29 @@ if __name__ == "__main__":
 
     set_screen()
     robot = EV3Robot()
-     
-
-    condition = time_condition()
-
-    while(condition):
-         
-         # color is Red, goal reached
-        if robot.goal_reached():
-            break
+    
+    for i in range(30):
         
-        if robot.reaching_an_object():
-            robot.turn_back()
-        
-        robot.step_action()
+        start_time  = time.time()
+        condition = time_condition(start_time)
 
-        condition = time_condition()
+        while(condition):
+            
+            # color is Red, goal reached
+            if robot.goal_reached():
+                break
+            
+            if robot.reaching_an_object():
+                robot.drive_back()
+                robot.turn_back()
+            
+            robot.step_action()
 
+            condition = time_condition(start_time)
 
-    debug_print_run_time()
+        debug_print("test num: ", i)
+        debug_print_run_time(start_time)
+        time.sleep(10)
 
         
     

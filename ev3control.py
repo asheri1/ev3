@@ -12,6 +12,7 @@ import json
 DISTANCE_LIMIT = 10 #cm
 
 
+
 def read_json_to_dict():
     # Load the JSON data from the file
     with open('QTable.json', 'r') as json_file:
@@ -90,6 +91,17 @@ class EV3Robot:
         self.stop_drive()
 
 
+    def drive_back(self, duration=1):
+        """
+        Drives the robot backwards.
+        :param speed: Base speed of the motors.
+        """
+        left_speed = -100
+        right_speed= -100
+        self.drive_with_time_suspension(left_speed, right_speed, duration=0.5)
+
+
+
     def turn_right(self, speed, turn_rate=50, duration=1):
         """
         Turns the robot right.
@@ -112,14 +124,15 @@ class EV3Robot:
         self.drive_with_time_suspension(left_speed, speed, duration)
 
 
-    def turn_back(self, speed=100, duration=1):
+    def turn_back(self, duration=1):
         """
-        Turns the robot backwards.
+        Turns the robot backwards in 180 degrees.
         :param speed: Base speed of the motors.
         :param turn_rate: Percentage to reduce the speed of the left motor.
         """
-        left_speed = 0
-        self.drive_with_time_suspension(left_speed, speed, duration)
+        left_speed = -100
+        right_speed = 0
+        self.drive_with_time_suspension(left_speed, right_speed, duration=1)
 
 
 
@@ -137,7 +150,7 @@ class EV3Robot:
     
 
     def reaching_an_object(self):
-        return self.read_distance() < DISTANCE_LIMIT
+        return self.read_distance() < DISTANCE_LIMIT or self.read_touch_sensor()
 
 
 
@@ -147,6 +160,8 @@ class EV3Robot:
         distance_state = int(self.read_distance())
         color_state = self.read_color_sensor()
         state = (touch_state, distance_state, color_state)
+        # formatted_time = time.strftime("%H:%M:%S", time.gmtime(time.time()))
+        # debug_print(state, " ", formatted_time )
         return state
     
     
@@ -158,11 +173,11 @@ class EV3Robot:
 
     def execute(self, next_action):
         if next_action == 0:
-           self.drive_with_time_suspension(left_speed=30, right_speed=30, duration=0.5)
+           self.drive_with_time_suspension(left_speed=50, right_speed=50, duration=0.15)
         elif next_action == 1:
-            self.turn_left(speed=50,duration=0.5)
+            self.turn_left(speed=50,duration=0.1)
         elif next_action == 2:
-            self.turn_right(speed=50,turn_rate=50,duration=0.5)
+            self.turn_right(speed=50,turn_rate=50,duration=0.1)
 
 
 
