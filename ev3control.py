@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 from screen_utils import *
 import time
+import random
 from ev3dev2.motor import LargeMotor, OUTPUT_A, OUTPUT_B, SpeedPercent, MoveTank
 from ev3dev2.sensor import INPUT_1, INPUT_2, INPUT_4
 from ev3dev2.sensor.lego import TouchSensor, ColorSensor, UltrasonicSensor
@@ -126,13 +127,19 @@ class EV3Robot:
 
     def turn_back(self, duration=1):
         """
-        Turns the robot backwards in 180 degrees.
-        :param speed: Base speed of the motors.
-        :param turn_rate: Percentage to reduce the speed of the left motor.
+        Turns the robot backwards in 180 degrees
         """
         left_speed = -100
         right_speed = 0
         self.drive_with_time_suspension(left_speed, right_speed, duration=1)
+
+
+    def turn_back_with_random_angle(self):
+        """
+        Turns the robot backwards randomiocally in 90 to 270 degrees.
+        """
+        random_time = random.uniform(0.5, 1.5)
+        self.turn_back(self, duration=random_time)
 
 
 
@@ -173,11 +180,11 @@ class EV3Robot:
 
     def execute(self, next_action):
         if next_action == 0:
-           self.drive_with_time_suspension(left_speed=50, right_speed=50, duration=0.15)
+           self.drive_with_time_suspension(left_speed=50, right_speed=50, duration=0.25)
         elif next_action == 1:
-            self.turn_left(speed=50,duration=0.1)
+            self.turn_left(speed=50,duration=0.25)
         elif next_action == 2:
-            self.turn_right(speed=50,turn_rate=50,duration=0.1)
+            self.turn_right(speed=50,turn_rate=50,duration=0.25)
 
 
 

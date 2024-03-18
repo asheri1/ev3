@@ -41,7 +41,7 @@ if __name__ == "__main__":
             
             if robot.reaching_an_object():
                 robot.drive_back()
-                robot.turn_back()
+                robot.turn_back_with_random_angle()
             
             robot.step_action()
 
