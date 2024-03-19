@@ -25,15 +25,15 @@ def get_run_time(start_time):
 
 def debug_print_run_time(test_num, start_time):
     formatted_time = get_run_time(start_time)
-    debug_print("test num: ", test_num)
+    debug_print("test num: ", test_num+1)
     debug_print("Time elapsed during the test: ", formatted_time)
 
 
 
-def write_results_to_file(test_num, start_time):
-    with open('results.txt', 'a') as f:
-            formatted_time = get_run_time(start_time)
-            f.write(f"Test num: {i+1},  run time: {formatted_time}")
+# def write_results_to_file(test_num, start_time):
+#     with open('results.txt', 'a') as f:
+#             formatted_time = get_run_time(start_time)
+#             f.write("Test num: %d,  run time: %s", test_num+1, formatted_time)
 
     
 
@@ -62,7 +62,7 @@ if __name__ == "__main__":
             condition = time_condition(start_time)
 
         debug_print_run_time(i, start_time)
-        write_results_to_file(i, start_time)
+        # write_results_to_file(i, start_time)
         time.sleep(10)
 
         

@@ -125,13 +125,13 @@ class EV3Robot:
         self.drive_with_time_suspension(left_speed, speed, duration)
 
 
-    def turn_back(self, duration=1):
+    def turn_back(self, duration):
         """
         Turns the robot backwards in 180 degrees
         """
         left_speed = -100
         right_speed = 0
-        self.drive_with_time_suspension(left_speed, right_speed, duration=1)
+        self.drive_with_time_suspension(left_speed, right_speed, duration)
 
 
     def turn_back_with_random_angle(self):
@@ -139,6 +139,7 @@ class EV3Robot:
         Turns the robot backwards randomiocally in 90 to 270 degrees.
         """
         random_time = random.uniform(0.5, 1.5)
+        debug_print(random_time)
         self.turn_back(self, duration=random_time)
 
 
