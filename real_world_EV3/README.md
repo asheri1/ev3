@@ -88,8 +88,8 @@ you will need to install Python and the `python-ev3dev` package on your computer
 
     On Windows (make sure you are using CMD, not PowerShell):
 
-        py -3 -m venv .venv
-        .venv\Scripts\activate
+        py 
+        .ve-3 -m venv .venvnv\Scripts\activate
         python -m pip install --upgrade pip
         pip install python-ev3dev2
 

@@ -30,10 +30,20 @@ def debug_print_run_time(test_num, start_time):
 
 
 
-# def write_results_to_file(test_num, start_time):
-#     with open('results.txt', 'a') as f:
-#             formatted_time = get_run_time(start_time)
-#             f.write("Test num: %d,  run time: %s", test_num+1, formatted_time)
+def write_results_to_file(test_num, start_time):
+    try:
+        script_dir = os.path.dirname(os.path.realpath(__file__))
+        file_path = os.path.join(script_dir, 'results.txt')
+        if(test_num == 0):
+            flag = 'w'
+        else: 
+            flag = 'a'
+        with open(file_path, flag) as f:
+            formatted_time = get_run_time(start_time)
+            formatted_str = "Test num: {}, run time: {}\n".format(test_num + 1, formatted_time)
+            f.write(formatted_str)
+    except Exception as e:
+        debug_print("Error occurred while creating or writing to file:", e)
 
     
 
@@ -62,7 +72,7 @@ if __name__ == "__main__":
             condition = time_condition(start_time)
 
         debug_print_run_time(i, start_time)
-        # write_results_to_file(i, start_time)
+        write_results_to_file(i, start_time)
         time.sleep(10)
 
         

@@ -139,8 +139,9 @@ class EV3Robot:
         Turns the robot backwards randomiocally in 90 to 270 degrees.
         """
         random_time = random.uniform(0.5, 1.5)
-        debug_print(random_time)
-        self.turn_back(self, duration=random_time)
+        # formatted_number = float("%.2f" % random_time)
+        # debug_print(formatted_number, type(formatted_number))
+        self.turn_back(random_time)
 
 
 
