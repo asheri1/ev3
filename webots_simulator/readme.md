@@ -6,7 +6,7 @@ This repository contains files related to a robot simulation in Webots. The simu
 
 1. **`ev3_bot.py`**: This Python script controls the EV3 robot in the simulation. It includes functions for motor control, sensor integration, and Q-Learning.
 
-2. **`world.txt`**: The Webots world file defines the simulated environment. It contains colored boxes, a robot, and various sensors.
+2. **`world.wbt`**: The Webots world file defines the simulated environment. It contains colored boxes, a robot, and various sensors.
 
 3. **`QTable.json`**: The Q-table output from the training process. It contains learned Q-values for state-action pairs.
 
