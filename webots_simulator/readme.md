@@ -1,35 +1,23 @@
-# Simulation Code
-## Webots World Simulation
+# Webots Robot Simulation
 
-This repository contains a Webots world file `world.wbt` for simulating a robot in a virtual environment. The world includes various objects and a robot with multiple sensors and actuators.
+This repository contains files related to a robot simulation in Webots. The simulation involves a robot navigating an environment, learning through Q-Learning, and interacting with various objects.
 
-### Features
+## Files
 
-- **World Setup**: The world consists of a rectangular arena with multiple colored boxes placed at different positions. The arena floor has a parquetry appearance.
-- **Robot**: The robot in the simulation is equipped with touch sensors, distance sensors,and a camera. It also has two wheels, each controlled by a separate motor.
-- **Sensors**: The robot uses its sensors to perceive its environment. The distance sensors and camera help the robot navigate the world and interact with the colored boxes.
+1. **`ev3_bot.py`**: This Python script controls the EV3 robot in the simulation. It includes functions for motor control, sensor integration, and Q-Learning.
 
-### Dependencies
+2. **`world.txt`**: The Webots world file defines the simulated environment. It contains colored boxes, a robot, and various sensors.
 
-The simulation requires Webots R2023b or later.
+3. **`QTable.json`**: The Q-table output from the training process. It contains learned Q-values for state-action pairs.
 
-### Usage
+## Features
 
-To run the simulation, open the `world.wbt` file in Webots. The robot's behavior can be controlled by modifying the `ev3_bot` controller script.
+- **Robot Control**: The `ev3_bot.py` script provides methods for controlling the robot's motors and processing sensor data.
+- **Sensor Integration**: The robot uses touch sensors, distance sensors, and a camera to perceive its environment.
+- **Q-Learning**: The Q-table represents the learned policy for the robot.
+- **Webots Environment**: The `world.txt` file defines the simulated world where the robot operates.
 
-## EV3_Bot.py
-
-This Python script is designed to control an EV3 robot using a variety of sensors and actuators. The robot is capable of performing actions such as moving forward, turning left or right, and reversing based on sensor inputs.
-
-### Features
-
-- **EV3 Robot Control**: The script includes a class `ev` that provides methods for controlling the robot's motors and processing sensor data.
-- **Sensor Integration**: The robot uses a distance sensor, a touch sensor, and a camera to perceive its environment.
-- **State and Action Spaces**: The script defines the state and action spaces for the robot, which can be used for reinforcement learning.
-- **Q-Learning**: The script includes functions for training the robot using Q-learning and for testing the trained policy.
-- **Environment Reset**: The script includes a function for resetting the robot's position in the environment.
-
-### Dependencies
+## Dependencies
 
 The script requires the following Python libraries:
 
@@ -37,9 +25,14 @@ The script requires the following Python libraries:
 - pandas
 - cv2 (OpenCV)
 - colorthief
+- numpy
+- pandas
+- json
+  
+## Usage
 
-### Usage
+1. Install Webots (version R2023b or later).
+2. Open `world.txt` in Webots to visualize the environment.
+3. Run the `ev3_bot.py` script to train the robot using Q-Learning.
 
-To run the script, simply execute the `main` function at the bottom of the script. This will create an instance of the `ev` class and start the training process.
-
-
+Happy simulating! 🤖🚀
