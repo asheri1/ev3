@@ -18,39 +18,21 @@ class ev:
     velocities  = []
 
     def __init__(self,robot,ds, touch_sensor, camera,left_motor,right_motor,supervisor):
-        #super(ev, self).__init__()
-        # Get the node representing "ROBOT1"
         self.supervisor = supervisor
         self.robot = robot
         self.camera = camera
-        #self.camera = self.getDevice("Color")
-        #self.camera.enable(self.timeStep)
-
         self.touch_sensor =  touch_sensor
-
         self.distance_sensor = ds
 
         self.motors.append(left_motor)
         self.motors.append(right_motor)
+        
         for motor in self.motors:
             motor.setPosition(float("inf"))
             motor.setVelocity(0.0)
 
     def boundSpeed(self, speed):
         return max(-self.maxSpeed, min(self.maxSpeed, speed))
-
-    def process_sensor_data(self):
-        # touch_value = self.touch_sensor.getValue()
-        DistanceSensor.enable(self.ir_sensor, 1)
-        ir_value = self.ir_sensor.getValue()
-        print("Distance: "+ir_value)
-        
-        # Implement your logic based on the sensor values
-        # This is just an example
-        if ir_value > 10:
-            return 0
-        else:
-            return self.maxSpeed
 
 
     def move_l_motor(self, speed):
@@ -91,7 +73,6 @@ class ev:
             return
     
 
-
     def wait(self, time_seconds):
         num_steps = int(time_seconds * 1000 / self.timeStep)  # convert time to simulation steps
         for _ in range(num_steps):
@@ -126,22 +107,6 @@ class ev:
         self.change_direction('left')
         self.change_direction('left')
         self.break_motors()
-    
-    def drive_in_circle(self, radius):
-        # Drive in a circle of given radius by setting differential speeds
-        speed_ratio = 1 - (1 / (1 + radius))  # This is just an example calculation
-        self.motors[0].setVelocity(self.maxSpeed)  # left wheel
-        self.motors[1].setVelocity(self.maxSpeed * speed_ratio)  # right wheel
-
-    def run(self):
-        pass
-        #while(True):
-            #speed = self.process_sensor_data()
-            #self.move_for_time(self.maxSpeed, 2)
-            #self.wait(2)
-            #speeds = turn_aside.turn_to()
-            #print(speeds)
-            #self.move_for_time(speeds, 0.5)
 
 
 # State and action spaces
@@ -153,7 +118,6 @@ NUM_ACTIONS = 3
 NUM_STATES = NUM_TOUCH_STATES * NUM_DISTANCE_STATES * NUM_COLOR_STATES
 
 MAX_MOVEs = 40  # Maximum number of moves per episode
-
 TIME_STEP = 32
 
 def reset_robot_position(supervisor):
@@ -183,7 +147,7 @@ def reset_robot_position(supervisor):
     # Set the initial rotation of the robot to (x=0, y=0, z=1,rad=0)
     right_wheel.getField("rotation").setSFRotation([0, -1, 0, 0.215])
 
-
+    # Get the floor nodes by thier name
     red_square = supervisor.getFromDef("redendpoint")
     blue_square = supervisor.getFromDef("Blue")
     green_square = supervisor.getFromDef("Green")
@@ -191,14 +155,16 @@ def reset_robot_position(supervisor):
     white_square = supervisor.getFromDef("White")
     yellow_square = supervisor.getFromDef("Yellow")
     brown_square = supervisor.getFromDef("Brown")
+    
+    # Set the range of the floor positions
     min_x, max_x = -0.6, 0.6
     min_z, max_z = -0.6, 0.6
 
-    # Generate random positions for the box within the floor range
+    # Generate random positions for the floor within the floor range
     x = random.uniform(min_x, max_x)
     z = random.uniform(min_z, max_z)
 
-    # Set the initial position of the box
+    # Set the initial position of the floors
     red_square.getField("translation").setSFVec3f([x, z , -0.04])  # Set a small elevation to place it on the floor
     blue_square.getField("translation").setSFVec3f([x-0.5, z , -0.04])
     green_square.getField("translation").setSFVec3f([x-0.5, z-0.5 , -0.04])
@@ -206,8 +172,6 @@ def reset_robot_position(supervisor):
     white_square.getField("translation").setSFVec3f([x+0.5, z-0.5 , -0.04])
     yellow_square.getField("translation").setSFVec3f([x+0.5, z , -0.04])
     brown_square.getField("translation").setSFVec3f([x+0.5, z+0.5 , -0.04])
-    
-
 
 def get_state(touch_sensor, ds, camera):
     # Modify the state representation based on sensor values
@@ -219,7 +183,6 @@ def get_state(touch_sensor, ds, camera):
     distance_value = int(ds.getValue()*100)
     color_value = get_color(camera)
     state = [touch_sensor.getValue(), distance_value, color_value]
-    # print(state)
     return state
 
 def get_color(camera):
@@ -236,10 +199,8 @@ def get_color(camera):
     # Use ColorThief to get the dominant color
     color_thief = ColorThief(temp_image_path)
     dominant_color = color_thief.get_color(quality=1)
-    #print ("TEMP",dominant_color)
     # Delete the temporary image file
     os.remove(temp_image_path)
-    
         
     # Determine the color index based on the dominant color
     color_index = get_color_index(*dominant_color)
@@ -279,15 +240,10 @@ def train(robot,redfloor, ds, touch_sensor, camera, supervisor,NUM_EPISODEs,q_ta
     left_motor = supervisor.getDevice("left wheel motor")
     right_motor = supervisor.getDevice("right wheel motor")
     robot_controller= ev(robot,ds, touch_sensor, camera,left_motor,right_motor,supervisor)
-    #print (Q)
 
     for episode in range(NUM_EPISODEs):
         if episode % 100 == 0:
             print("Episode:", episode)
-
-        # Stop the robot's motion
-        #left_motor.setVelocity(0.0)
-        #right_motor.setVelocity(0.0)
 
         # Reset the robot's position
         reset_robot_position(supervisor)
@@ -301,16 +257,11 @@ def train(robot,redfloor, ds, touch_sensor, camera, supervisor,NUM_EPISODEs,q_ta
         while moves < MAX_MOVEs and not stucked:
             # Choose an action using epsilon-greedy policy
             rand = np.random.uniform()
-            #print("rand ",rand, " EPSILOn ",EPSILOn)
             if rand < epsilon_var:
                 action = np.random.randint(NUM_ACTIONS)  # Exploration
-                #print ("Action =",action)
             else:
-                #print("Q \n",Q.loc[state[0],state[1],state[2]][0])
                 action = q_table.loc[state[0],state[1],state[2]].argmax()  # Exploitation
-            #print ("Action =",action)
             if(state[1]<10):
-                #print("Episode:", episode, " Got Stuck")
                 stuck+=1
                 stucked = True
             # Perform the chosen action
@@ -322,9 +273,6 @@ def train(robot,redfloor, ds, touch_sensor, camera, supervisor,NUM_EPISODEs,q_ta
             elif action == 2:
                 # Turn right
                 robot_controller.change_direction("right")
-            elif action == 3:
-                # move reverse
-                robot_controller.move_mini_reverse()
 
             # Wait for the next time step
             supervisor.step(TIME_STEP)
@@ -334,7 +282,6 @@ def train(robot,redfloor, ds, touch_sensor, camera, supervisor,NUM_EPISODEs,q_ta
             # Check if the episode has ended (e.g., reaching the red floor)
             if next_state[2] == 5:  
                 reward = goal_reward  # Modify the reward calculation based on your task
-                #print("Episode:", episode, "Red floor reached! reward",q_table.loc[tuple(state), action])
                 won+=1
                 end = True     
 
@@ -361,7 +308,6 @@ def train(robot,redfloor, ds, touch_sensor, camera, supervisor,NUM_EPISODEs,q_ta
 
         if moves >= MAX_MOVEs:
             failcount+=1
-            #print("Episode:", episode, "Maximum moves reached reward ",q_table.loc[tuple(state), action])
         # Save Q-table
         np.save('q_table.npy', q_table)
         # Decay the exploration rate
@@ -397,12 +343,6 @@ def check(robot,redfloor, ds, touch_sensor, camera, supervisor,NUM_EPISODEs):
     Q = {tuple(map(int, key.split(','))): int(value) if isinstance(value, int) else value for key, value in Q_dict_str_keys.items()}
 
     for episode in range(NUM_EPISODEs):
-        #print("Episode:", episode)
-
-        # Stop the robot's motion
-        #left_motor.setVelocity(0.0)
-        #right_motor.setVelocity(0.0)
-
         # Reset the robot's position
         reset_robot_position(supervisor)
         supervisor.step(TIME_STEP)
@@ -412,9 +352,7 @@ def check(robot,redfloor, ds, touch_sensor, camera, supervisor,NUM_EPISODEs):
         moves = 0
         while moves < MAX_MOVEs and not stucked:
             # Choose an action using epsilon-greedy policy
-            #print("Q \n",Q.loc[state[0],state[1],state[2]][0])
             action = Q[(state[0],state[1],state[2])] # Exploitation
-            #print ("Action =",action)
             if(state[1]<10):
                 #print("Episode:", episode, " Got Stuck")
                 stuck+=1
@@ -425,22 +363,13 @@ def check(robot,redfloor, ds, touch_sensor, camera, supervisor,NUM_EPISODEs):
             # Perform the chosen action
             if action == 0:
                 # Move forward
-                #left_motor.setVelocity(10.0)
-                #right_motor.setVelocity(10.0)
                 robot_controller.move_for_time(10.0, 1)                
             elif action == 1:
                 # Turn left
-                #left_motor.setVelocity(0.0)
-                #right_motor.setVelocity(10.0)
                 robot_controller.change_direction("left")
             elif action == 2:
                 # Turn right
-                #left_motor.setVelocity(10.0)
-                #right_motor.setVelocity(0.0)
                 robot_controller.change_direction("right")
-            elif action == 3:
-                    # move reverse
-                    robot_controller.move_mini_reverse()
 
             # Wait for the next time step
             supervisor.step(TIME_STEP)
@@ -452,10 +381,8 @@ def check(robot,redfloor, ds, touch_sensor, camera, supervisor,NUM_EPISODEs):
                 won+=1     
                 break
             
-
             # Update the current state
             state = next_state
-
             moves += 1
 
         if moves >= MAX_MOVEs:
@@ -494,7 +421,6 @@ def main():
     NUM_EPISODEs = 1000  # Number of training episodes
     MAX_MOVEs = 50
     result_dict = {}
-    #loop to check what number of episodes is best
     # Create a multi-index for the Q-table using pandas
     index = pd.MultiIndex.from_product(
         [range(NUM_TOUCH_STATES), range(NUM_DISTANCE_STATES), range(NUM_COLOR_STATES)],
@@ -502,7 +428,6 @@ def main():
     )
     collision_reward = -10
     goal_reward = 100
-    #for i in range(1,5):
     q_table = pd.DataFrame(index=index, columns=range(NUM_ACTIONS)).fillna(0.0)
     won,stuck,EPSILOn = train(robot,redfloor, ds, touch_sensor, camera, supervisor,NUM_EPISODEs,q_table,EPSILOn,ALPHa, GAMMa,collision_reward,goal_reward)
     print("won:" +str(won)+"fail:"+str(stuck) +" with NUM_EPISODES = "+str(NUM_EPISODEs)+"EPSILON = "+str(EPSILOn) + "ALPHA = "+str(ALPHa) + "GAMMA = "+str(GAMMa) + "COLLISION_REWARD = "+str(collision_reward) + "GOAL_REWARD = "+str(goal_reward))
